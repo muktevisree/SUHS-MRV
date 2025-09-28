@@ -1,0 +1,24 @@
+field,osdu_anchor_entity,ofp_concept,mrv_reference
+facility_id,Facility (WKS),OFP:Facility,FAIR metadata
+country_code,Facility (WKS),OFP:Geography,FAIR metadata
+lat,Facility/Well,OFP:Geography,FAIR metadata
+lon,Facility/Well,OFP:Geography,FAIR metadata
+reservoir_type,Storage Facility/Asset,OFP:AssetAttribute:Reservoir,UHS best practice
+well_id,Well/Wellbore (WKE),OFP:Source:Well,Ops anchoring
+injection_start_date,Wellbore Operation,OFP:ActivityPeriod,MRV timeframe
+injection_end_date,Wellbore Operation,OFP:ActivityPeriod,MRV timeframe
+h2_injected_tonnes,ProductionData (WKE),OFP:Quantity (mass),UHS MRV balance
+h2_withdrawn_tonnes,ProductionData (WKE),OFP:Quantity (mass),UHS MRV balance
+h2_cushion_gas_tonnes,Storage Facility,OFP:Inventory/AssetAttribute,Operational constraint
+h2_losses_tonnes,Measurement,OFP:Emission/Loss,Mass balance
+h2_net_stored_tonnes,Storage Site,OFP:CalculatedValue,MRV mass balance
+compression_energy_MWh,Measurement (Energy),OFP:Consumption:Energy,Efficiency KPI
+transport_mode,Pipeline/Logistics,OFP:Logistics,Context
+pipeline_length_km,Pipeline/AssetAttribute,OFP:AssetAttribute,Context
+avg_reservoir_pressure_MPa,Reservoir,OFP:Measurement,Ops telemetry
+avg_reservoir_temp_C,Reservoir,OFP:Measurement,Ops telemetry
+mmv_methods,—,OFP:Method,MRV plan
+leak_events_count,Event,OFP:Event,MRV
+leak_mass_tonnes,Event/Measurement,OFP:Emission:Leakage,MRV
+methane_co_produced_tonnes,ProductionData,OFP:Emission:CH4,OGMP 2.0
+ogmp_source_category,—,OFP:Category,OGMP 2.0

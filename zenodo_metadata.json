@@ -1,0 +1,33 @@
+{
+  "title": "Synthetic UHS\u2013MRV Dataset for OFP\u2013OSDU Integration in Hydrogen Storage Reporting (SUHS-OFPOSDU)",
+  "upload_type": "dataset",
+  "description": "Ten synthetic UHS facilities with annual, daily, and monthly injection/withdrawal data aligned to OFP and OSDU with MRV best practices.",
+  "creators": [
+    {
+      "name": "Sreekanth Muktevi",
+      "affiliation": "YASH Technologies"
+    },
+    {
+      "name": "Yogesh Nagpal",
+      "affiliation": "YASH Technologies"
+    },
+    {
+      "name": "Rajesh Leela Thotakura",
+      "affiliation": "YASH Technologies"
+    },
+    {
+      "name": "Jyotsna Muktevi",
+      "affiliation": "YASH Technologies"
+    }
+  ],
+  "keywords": [
+    "UHS",
+    "Hydrogen",
+    "MRV",
+    "OSDU",
+    "Open Footprint",
+    "Synthetic dataset"
+  ],
+  "license": "cc-by-4.0",
+  "version": "1.0"
+}

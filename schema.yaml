@@ -1,0 +1,12 @@
+version: 1.0
+title: UHS–MRV Synthetic Dataset Schema
+tables:
+  - name: uhs_full_dataset_v1.0
+    primary_key: record_id
+    description: Annual facility-level UHS dataset
+  - name: uhs_daily_v1.0
+    primary_key: [case_id, date]
+    description: Daily injection/withdrawal per case
+  - name: uhs_monthly_v1.0
+    primary_key: [case_id, month]
+    description: Monthly roll-up per case

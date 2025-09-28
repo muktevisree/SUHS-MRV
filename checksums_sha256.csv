@@ -1,0 +1,4 @@
+file,sha256
+data/uhs_full_dataset_v1.0.csv,3104ea5ac683bcf8ff2dd8d95c7272e463a825fd44b5707be0279e6095b80456
+data/uhs_daily_v1.0.csv,83861354cebd83719adbecfbc4a7be8750961e9266e0d96fecaeda8cdee1c802
+data/uhs_monthly_v1.0.csv,4974f241d0873d935792b05a468d64340513f490f61d85c6651184ad25a7f835
