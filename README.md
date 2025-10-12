@@ -1,3 +1,5 @@
+https://doi.org/10.5281/zenodo.17330832
+
 # Synthetic UHS–MRV Dataset for OFP–OSDU Integration in Hydrogen Storage Reporting (SUHS-OFPOSDU)
 
 ## Authors
@@ -93,7 +95,7 @@ All latitude/longitude values are **synthetic**, generated randomly within U.S. 
 - Users are free to share and adapt with appropriate credit.  
 
 **Citation:**  
-Muktevi, S., Nagpal, Y., Thotakura, R. L., & Muktevi, J. (2025). *Synthetic UHS–MRV Dataset for OFP–OSDU Integration in Hydrogen Storage Reporting (SUHS-OFPOSDU)* [Data set]. Zenodo. https://doi.org/10.5281/zenodo.TBD  
+Muktevi, S., Nagpal, Y., Thotakura, R. L., & Muktevi, J. (2025). *Synthetic UHS–MRV Dataset for OFP–OSDU Integration in Hydrogen Storage Reporting (SUHS-OFPOSDU)* [Data set].(https://doi.org/10.5281/zenodo.17330832) 
 
 ---
 
