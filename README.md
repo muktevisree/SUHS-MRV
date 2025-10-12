@@ -45,16 +45,19 @@ All values are **synthetically generated** but follow realistic industry ranges 
 “Annual file start/end dates represent the reporting year (2024). Daily and monthly tables provide the actual time series of injection/withdrawal activities within this period.”
 
 ---
-## Schema Alignment
-This dataset has been explicitly mapped to the OFP emissions model and to publicly available OSDU Well-Known Schemas (WKS) and Well-Known Entities (WKE), including:
+## OSDU Schema Alignment (2025 Standard)
+Compliant with the **OSDU Data Definitions repository** (*The Open Group, 2025*).  
+Earlier *WKE* prefixes replaced with current *WKS* identifiers.
 
-- **WKS:master-data–Facility** → `facility_id`, `country_code`, `lat`, `lon`, `reservoir_type`  
-- **WKS:master-data–Asset** → `capture_tech`, `pipeline_length_km`, `transport_mode`  
-- **WKE:Wellbore / Well** → `well_id`, `injection_start_date`, `injection_end_date`, `avg_reservoir_pressure_MPa`, `avg_reservoir_temp_C`  
-- **WKE:ProductionData** → `h2_injected_tonnes`, `h2_withdrawn_tonnes`, `methane_co_produced_tonnes`  
-- **WKE:Measurement** → `h2_cushion_gas_tonnes`, `compression_energy_MWh`, `h2_losses_tonnes`  
-- **WKE:Event / Method** → `leak_events_count`, `leak_mass_tonnes`, `mmv_methods`, `ogmp_source_category`  
-- **(Proposed) EnvironmentalData extension** → `h2_net_stored_tonnes`  
+| Schema Group | Entity | Identifier |
+|---------------|---------|------------|
+| Master Data | Facility | `WKS:master-data--Facility:1.0.0` |
+| Master Data | Asset | `WKS:master-data--Asset:1.0.0` |
+| Master Data | Wellbore | `WKS:master-data--Wellbore:1.0.0` |
+| Work Product Component | Measurement | `WKS:work-product-component--Measurement:1.0.0` |
+| Work Product Component | ProductionData | `WKS:work-product-component--ProductionData:1.0.0` |
+| Work Product Component | EventMethod | `WKS:work-product-component--EventMethod:1.0.0` |
+| Extension (Proposed) | EnvironmentalData | `WKS:extension--EnvironmentalData:1.0.0` |
 
 ---
 
