@@ -348,10 +348,10 @@ def simulate_facility_timeseries(
     # Initialize states
     working_gas_kg = working_capacity_kg * 0.5  # start half full
     static_leak_per_year = _sample_uniform(
-        rng,
-        cfg["losses"]["static_leak_kg_per_year"]["min"],
-        cfg["losses"]["static_leak_kg_per_year"]["max"],
-    )
+    rng,
+    loss_cfg.static_leak_min_kg_per_year,
+    loss_cfg.static_leak_max_kg_per_year,
+)
     static_leak_per_week = static_leak_per_year / 52.0
 
     injection_mean = dist_cfg["injection_mass_kg"]["relative_mean"]
