@@ -1,3 +1,9 @@
+> **Update (Dec 2025):**  
+> The repository is being refactored to introduce a full physics-based dataset generator and reproducible workflow for SUHS-MRV v2.0.0.  
+> - `data/legacy/` contains the original v1.0.0 synthetic dataset.  
+> - `data/generated/` will contain the new physics-based dataset.  
+> - `src/`, `config/`, `docs/`, and `notebooks/` contain the reproducible workflow and modeling code.
+
 https://doi.org/10.5281/zenodo.17330832
 
 # Synthetic UHS–MRV Dataset for OFP–OSDU Integration in Hydrogen Storage Reporting (SUHS-OFPOSDU)
