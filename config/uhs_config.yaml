@@ -1,1 +1,375 @@
+# =====================================================================
+# SUHS-MRV UHS CONFIGURATION (v2.0.0 - DRAFT)
+# ---------------------------------------------------------------------
+# This file defines all parameters for generating the Synthetic
+# Underground Hydrogen Storage MRV dataset.
+#
+# GOALS:
+# - Make the physics and statistics explicit (addresses Reviewer 1).
+# - Use realistic but simplified salt cavern + porous reservoir models
+#   (addresses Reviewer 2).
+# - Support forward-compatible alignment with OFP + OSDU (conceptual).
+# =====================================================================
 
+global:
+  random_seed: 42          # For reproducibility
+  n_facilities: 50         # Total number of storage facilities
+
+  simulation:
+    start_date: "2030-01-01"  # Synthetic future scenario
+    n_years: 10               # Total duration
+    time_step: "weekly"       # Reviewer 2: do NOT use daily cycling
+
+  # Controls relative weight of facility types when sampling
+  facility_type_weights:
+    salt_cavern: 0.7
+    porous_reservoir: 0.3
+
+  # For future integration with SynData-ESG toolkit (documentation only)
+  syn_data_esg:
+    module_name: "uhs"
+    version: "2.0.0"
+
+# ---------------------------------------------------------------------
+# PHYSICAL & GEOLOGICAL PARAMETERS
+# ---------------------------------------------------------------------
+facility_types:
+
+  # ================================================================
+  # SALT CAVERN UHS FACILITIES
+  # ================================================================
+  salt_cavern:
+    enabled: true
+
+    # Volumetric capacity of individual caverns (approximate)
+    cavern_volume_m3:
+      distribution: "lognormal"
+      mean: 200000        # geometric mean ~ 2e5 m3
+      sigma: 0.5          # log-space spread
+      min: 50000
+      max: 1000000
+
+    # Depth range for salt caverns (simplified)
+    depth_m:
+      distribution: "uniform"
+      min: 800
+      max: 2000
+
+    # Pressure operating window (Reviewer 2: must be explicit)
+    pressure_min_mpa: 4.0
+    pressure_max_mpa: 18.0
+
+    # Temperature model: base + gradient*depth
+    base_temperature_c: 25.0             # Surface / shallow reference temp
+    temperature_gradient_c_per_km: 25.0  # °C per km
+
+    # Hydrogen is both working gas AND cushion gas in salt caverns
+    # (Reviewer 2: salt caverns use H2 as cushion gas)
+    cushion_gas: "H2"
+    working_gas_fraction_of_total: 0.4  # fraction of (cavern volume * density)
+
+    # Optional: facility-level variation in efficiency bounds
+    cycle_efficiency_bounds:
+      min: 0.7
+      max: 0.95
+
+  # ================================================================
+  # POROUS RESERVOIR UHS FACILITIES (OPTIONAL, BUT STRENGTHENS PHYSICS)
+  # ================================================================
+  porous_reservoir:
+    enabled: true
+
+    # Reservoir rock properties
+    porosity:
+      distribution: "uniform"
+      min: 0.12
+      max: 0.28
+
+    permeability_mD:
+      distribution: "lognormal"
+      mean: 100.0         # millidarcies
+      sigma: 0.8
+      min: 5.0
+      max: 1000.0
+
+    depth_m:
+      distribution: "uniform"
+      min: 1000
+      max: 2500
+
+    # Approximate pressure limits (simplified)
+    pressure_min_mpa: 8.0
+    pressure_max_mpa: 25.0
+
+    base_temperature_c: 30.0             # Slightly higher for deeper units
+    temperature_gradient_c_per_km: 30.0  # °C per km
+
+    # Portion of pore volume that is usable for working gas storage
+    working_gas_fraction_of_pore_volume: 0.5
+
+    # Darcy-flow based injectivity approximation parameters
+    darcy_injectivity:
+      # These are used in simplified form in physics.py; not full simulations.
+      fluid_viscosity_cP: 0.02
+      drainage_radius_m: 500.0
+      well_radius_m: 0.15
+
+# ---------------------------------------------------------------------
+# CYCLING & OPERATIONAL STRATEGY
+# ---------------------------------------------------------------------
+cycling:
+  frequency: "weekly"
+  allow_daily_cycles: false   # Reviewer 2: daily injection is unrealistic
+  max_cycles_per_year: 30     # Not all weeks are active cycles
+  min_cycles_per_year: 10
+
+  # Strategy for injection/withdrawal pattern selection per facility
+  pattern_model: "stochastic"  # could later be ["stochastic", "seasonal"]
+
+  # Fraction of cycles that are injection-dominant vs withdrawal-dominant
+  mode_mix:
+    injection_heavy_fraction: 0.5
+    withdrawal_heavy_fraction: 0.3
+    balanced_fraction: 0.2
+
+  # Bounds for cycle-level mass flows (relative to storage capacity)
+  cycle_mass_fraction_of_capacity:
+    min: 0.05      # each active cycle uses at least 5% of working capacity
+    max: 0.5       # and at most 50%
+
+  # Operational constraints on ramping
+  max_relative_change_in_cycle_mass:
+    per_cycle: 0.3   # limit how fast injection/withdrawal size can change
+
+# ---------------------------------------------------------------------
+# THERMODYNAMICS & GAS PROPERTIES
+# (Used in physics.py; simplified but explicit)
+# ---------------------------------------------------------------------
+thermodynamics:
+  gas_constant_R_J_per_molK: 8.314
+  molar_mass_H2_kg_per_mol: 0.002016
+
+  # Compressibility factor Z model:
+  # Use a simple approximation; can be refined later.
+  compressibility_Z:
+    model: "piecewise_constant"
+    segments:
+      - pressure_min_mpa: 0.0
+        pressure_max_mpa: 5.0
+        Z: 1.0
+      - pressure_min_mpa: 5.0
+        pressure_max_mpa: 15.0
+        Z: 1.05
+      - pressure_min_mpa: 15.0
+        pressure_max_mpa: 30.0
+        Z: 1.1
+
+  # Temperature perturbations around the geothermal gradient
+  temperature_noise_c:
+    distribution: "normal"
+    mean: 0.0
+    std: 1.0
+
+# ---------------------------------------------------------------------
+# LOSSES, PURITY & MASS BALANCE
+# ---------------------------------------------------------------------
+losses:
+  model: "proportional"   # simple fraction of working gas in each cycle
+  loss_fraction:
+    distribution: "uniform"
+    min: 0.001            # 0.1%
+    max: 0.02             # 2%
+
+  # Additional static leak term (can be set to 0.0 if not needed)
+  static_leak_kg_per_year:
+    min: 0.0
+    max: 10000.0
+
+purity:
+  # Purity of hydrogen entering the facility
+  inlet_purity_pct:
+    distribution: "normal"
+    mean: 99.9
+    std: 0.05
+    min: 98.0
+    max: 100.0
+
+  # Mixing model parameters for outlet purity after cycling
+  outlet_purity_noise_pct:
+    distribution: "normal"
+    mean: 0.0
+    std: 0.1
+    min: -1.0
+    max: 0.0
+
+mass_balance:
+  tolerance_fraction: 0.001   # 0.1% allowed numerical error
+
+# ---------------------------------------------------------------------
+# STATISTICAL DISTRIBUTIONS FOR FLOWS & NOISE
+# ---------------------------------------------------------------------
+distributions:
+
+  injection_mass_kg:
+    distribution: "lognormal"
+    # These are relative to "effective capacity", scaled per facility
+    relative_mean: 0.15
+    relative_sigma: 0.6
+    min_fraction_of_capacity: 0.02
+    max_fraction_of_capacity: 0.6
+
+  withdrawal_mass_kg:
+    distribution: "lognormal"
+    relative_mean: 0.12
+    relative_sigma: 0.7
+    min_fraction_of_capacity: 0.02
+    max_fraction_of_capacity: 0.6
+
+  pressure_noise_mpa:
+    distribution: "normal"
+    mean: 0.0
+    std: 0.2
+
+# ---------------------------------------------------------------------
+# VALIDATION SETTINGS (for src/validation.py and notebook 03)
+# ---------------------------------------------------------------------
+validation:
+  # Pressure must stay within this margin of min/max facility bounds
+  pressure_bounds_margin_mpa: 0.5
+
+  # Temperature sanity range for all facilities
+  temperature_c:
+    min: 0.0
+    max: 120.0
+
+  # Purity must be between 0 and 100%
+  purity_pct:
+    min: 0.0
+    max: 100.0
+
+  # Loss fraction must remain within configured bounds used in "losses"
+  loss_fraction:
+    min: 0.001   # same as losses.loss_fraction.min
+    max: 0.02    # same as losses.loss_fraction.max
+
+  # Missing value checks
+  allow_missing_values: false
+
+# ---------------------------------------------------------------------
+# DATASET STRUCTURE & TABLE DEFINITIONS
+# (These are NOT schemas, but guide generator.py and docs.)
+# ---------------------------------------------------------------------
+dataset:
+  tables:
+    facility_metadata:
+      description: "Static attributes for each UHS facility."
+      primary_key: "facility_id"
+      fields:
+        - name: "facility_id"
+          type: "string"
+        - name: "facility_type"
+          type: "string"   # salt_cavern / porous_reservoir
+        - name: "country_code"
+          type: "string"
+        - name: "region"
+          type: "string"
+        - name: "latitude"
+          type: "float"
+        - name: "longitude"
+          type: "float"
+        - name: "depth_m"
+          type: "float"
+        - name: "cavern_volume_m3"
+          type: "float"
+        - name: "porosity"
+          type: "float"
+        - name: "permeability_mD"
+          type: "float"
+        - name: "pressure_min_mpa"
+          type: "float"
+        - name: "pressure_max_mpa"
+          type: "float"
+
+    facility_timeseries:
+      description: "Weekly UHS operational MRV measurements per facility."
+      primary_key: ["facility_id", "timestamp"]
+      fields:
+        - name: "facility_id"
+          type: "string"
+        - name: "timestamp"
+          type: "datetime"
+        - name: "cycle_index"
+          type: "integer"
+        - name: "is_cycle_active"
+          type: "boolean"
+        - name: "h2_injected_kg"
+          type: "float"
+        - name: "h2_withdrawn_kg"
+          type: "float"
+        - name: "working_gas_kg"
+          type: "float"
+        - name: "cushion_gas_kg"
+          type: "float"
+        - name: "losses_kg"
+          type: "float"
+        - name: "pressure_mpa"
+          type: "float"
+        - name: "temperature_c"
+          type: "float"
+        - name: "purity_in_pct"
+          type: "float"
+        - name: "purity_out_pct"
+          type: "float"
+        - name: "cycle_efficiency"
+          type: "float"
+
+    cycle_summary:
+      description: "One row per completed cycle per facility."
+      primary_key: ["facility_id", "cycle_index"]
+      fields:
+        - name: "facility_id"
+          type: "string"
+        - name: "cycle_index"
+          type: "integer"
+        - name: "cycle_start"
+          type: "datetime"
+        - name: "cycle_end"
+          type: "datetime"
+        - name: "total_injected_kg"
+          type: "float"
+        - name: "total_withdrawn_kg"
+          type: "float"
+        - name: "total_losses_kg"
+          type: "float"
+        - name: "avg_pressure_mpa"
+          type: "float"
+        - name: "avg_temperature_c"
+          type: "float"
+        - name: "cycle_efficiency"
+          type: "float"
+
+# ---------------------------------------------------------------------
+# FORWARD-COMPATIBLE ALIGNMENT WITH OFP & OSDU
+# (Conceptual only; no claim that UHS-specific schemas exist yet.)
+# ---------------------------------------------------------------------
+ofp_alignment:
+  conceptual_alignment_only: true
+  facility_identifier_field: "facility_id"
+  activity_time_granularity: "weekly"
+  measurement_context: "underground_hydrogen_storage_cycle"
+  notes:
+    - "Facilities map conceptually to OFP Facility entities."
+    - "Weekly injection/withdrawal cycles map to OFP Activity + Measurement."
+    - "This dataset can support future OFP-based emissions modeling
+       (e.g., compression energy, leaks) but does not define emissions fields itself."
+
+osdu_alignment:
+  conceptual_alignment_only: true
+  entities:
+    facility: "OSDU Facility / master-data concept (no UHS-specific WKS as of 2025)."
+    well_or_wellbore: "OSDU Well / Wellbore concepts for injection/withdrawal wells."
+    measurement: "OSDU Measurement / time-series concepts for pressure, temperature, flows."
+  notes:
+    - "UHS facilities are treated as specialized Facility instances."
+    - "Time-series rows are conceptually compatible with OSDU Measurement patterns."
+    - "No official OSDU UHS schema exists at this time; this dataset acts as a prototype."
