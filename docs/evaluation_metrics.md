@@ -1,6 +1,6 @@
-Evaluation Metrics
+**Evaluation Metrics**
 
-SUHS–MRV Dataset (v2.0)
+**SUHS–MRV Dataset (v2.0)**
 
 This document defines the evaluation metrics used to assess the quality, stability, and realism of the SUHS-MRV synthetic Underground Hydrogen Storage dataset. These metrics help reviewers, modelers, and engineers validate the dataset for MRV (Measurement, Reporting & Verification), digital twins, simulation engines, and ESG reporting pipelines.
 
@@ -16,7 +16,7 @@ The metrics covered include:
 
 ⸻
 
-1. Mass-Balance Accuracy (MRV Residual)
+**1. Mass-Balance Accuracy (MRV Residual)**
 
 Mass balance is the core MRV requirement:
 
@@ -37,7 +37,7 @@ Typical dataset distribution:
 
 ⸻
 
-2. Pressure Stability Metrics
+**2. Pressure Stability Metrics**
 
 2.1 Envelope Compliance
 
@@ -68,7 +68,7 @@ Dataset automatically adheres to this.
 
 ⸻
 
-3. Temperature Realism Metrics
+**3. Temperature Realism Metrics**
 
 Temperature model:
 
@@ -95,7 +95,7 @@ Dataset adheres to these constraints.
 
 ⸻
 
-4. Purity Model Validation
+**4. Purity Model Validation**
 
 4.1 Purity stays within physical bounds
 
@@ -125,7 +125,7 @@ Evaluate via rolling slope estimation.
 
 ⸻
 
-5. Static & Dynamic Loss Validation
+**5. Static & Dynamic Loss Validation**
 
 5.1 Static loss ratio
 
@@ -157,7 +157,7 @@ Dataset enforces capped ranges and realistic distributions.
 
 ⸻
 
-6. Injection/Withdrawal Cycle Metrics
+**6. Injection/Withdrawal Cycle Metrics**
 
 6.1 Cycle fraction envelope
 
@@ -188,7 +188,7 @@ transition_distribution = value_counts(modes_t → modes_t+1)
 
 ⸻
 
-7. Schema Completeness Metrics
+**7. Schema Completeness Metrics**
 
 (For OSDU/WKS & OFP alignment)
 
@@ -222,7 +222,7 @@ Metric: manual reviewer checklist (aligned in README)
 
 ⸻
 
-8. Dataset-Level Statistical Health Checks
+**8. Dataset-Level Statistical Health Checks**
 
 8.1 Time-Series Continuity
 
@@ -253,7 +253,7 @@ violation_rate should be 0.
 
 ⸻
 
-9. Recommended Validation Workflow
+**9. Recommended Validation Workflow**
 	1.	Load all CSVs
 	2.	Perform completeness check
 	3.	Validate mass-balance residual distribution
