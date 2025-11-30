@@ -82,3 +82,157 @@ Noise affects:
 - Computed pressure  
 - Density relationships  
 - Purity degradation rates (small effect)
+
+---
+
+# 4. Loss Models
+
+Underground hydrogen storage experiences two major categories of losses:
+
+## **4.1 Static Losses**
+Represent persistent micro-leakage or cushion gas interactions.
+
+Model:
+
+\[
+L_{\text{static}} = k_s \cdot m_{\text{working}}
+\]
+
+- **k_s** sampled from YAML distribution  
+- Represents 0.01–0.05% of mass per time-step typically  
+- More important for long-term storage
+
+## **4.2 Dynamic Losses**
+Generated during pressure/temperature cycling.
+
+Model:
+
+\[
+L_{\text{dynamic}} = f(m_{\text{working}}, \Delta P, \Delta T)
+\]
+
+Implemented via:
+
+```python
+dynamic_losses_kg = compute_cycle_losses_kg(working_gas_kg, loss_fraction)
+
+Loss fraction sampled from YAML to emulate:
+	•	Valves
+	•	Line-pack disturbances
+	•	Mixing inefficiencies
+	•	Temperature swings
+
+**5. Purity Tracking Model**
+
+Purity in/out is computed using a dual-process model:
+
+Inlet purity
+
+Randomly sampled: inlet_purity = sample_inlet_purity_pct(cfg, rng)
+
+Outlet purity
+
+Outlet purity depends on:
+	•	Current working gas purity
+	•	Inlet purity
+	•	Injection/withdrawal ratio
+	•	Temperature & pressure
+
+Model:
+
+[
+\text{purity}{\text{out}} = f(\text{purity}{\text{working}}, m_{\text{inj}}, m_{\text{wd}})
+]
+
+Implemented as:
+outlet_purity = update_purity_out_pct(
+    working_purity_pct,
+    inlet_purity_pct,
+    injected_mass_kg,
+    withdrawn_mass_kg,
+    cfg
+)
+
+Working gas purity update
+
+After each cycle:
+
+[
+\text{working_purity}_{t+1} =
+\text{weighted mean of (previous purity, inlet purity)}
+]
+
+This ensures impurity buildup over cycles, matching actual UHS behavior.
+
+**6. MRV: Mass-Balance Validation**
+
+The MRV residual quantifies model accuracy:
+
+[
+\text{residual} =
+\frac{m_{t+1} - (m_t + m_{\text{inj}} - m_{\text{wd}} - L_s - L_d)}{m_{\text{capacity}}}
+]
+
+Values are normally in:
+	•	10⁻⁶ – 10⁻⁴ range for stable operations
+	•	Any value > 1e-3 indicates anomaly conditions (kept for realism)
+
+---
+
+
+**# 7. Injection/Withdrawal Cycle Simulation**
+
+Each facility is simulated across multiple cycles.
+
+### **7.1 Cycle direction modes**
+
+- injection_heavy  
+- withdrawal_heavy  
+- balanced  
+
+### **7.2 Cycle fraction dynamics**
+
+The engine enforces:
+
+- Random walk variations  
+- Hard caps: **0.1 ≤ cycle_fraction ≤ 0.9**  
+- Maximum per-cycle injection/withdrawal ≤ **25% capacity**
+
+### **7.3 Time resolution**
+
+Configured in YAML:
+
+frequency: weekly → W
+frequency: daily  → D
+frequency: monthly → MS
+
+Converted via:
+
+```python
+FREQ_MAP = {"weekly": "W", "daily": "D", "monthly": "MS"}
+
+**8. Alignment with OFP & OSDU**
+
+Every field is aligned to:
+
+✔ OFP (Open Footprint)
+	•	Working gas mass
+	•	Losses
+	•	Purity
+	•	MRV residuals
+
+✔ OSDU WKS/WKE
+	•	Facility metadata
+	•	Reservoir parameters
+	•	Temperature & pressure
+	•	Production + injection records
+
+This ensures interoperability with:
+	•	OSDU Core Services
+	•	OFP MRV Engines
+	•	Digital twins
+	•	ESG reporting pipelines
+
+⸻
+
+✔ End of Document
