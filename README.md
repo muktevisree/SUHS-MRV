@@ -1,113 +1,165 @@
-> **Update (Nov 2025):**  
-> The repository is being refactored to introduce a full physics-based dataset generator and reproducible workflow for SUHS-MRV v2.0.0.  
-> - `data/legacy/` contains the original v1.0.0 synthetic dataset.  
-> - `data/generated/` will contain the new physics-based dataset.  
-> - `src/`, `config/`, `docs/`, and `notebooks/` contain the reproducible workflow and modeling code.
+# Synthetic Underground Hydrogen Storage MRV Dataset (SUHS-MRV)
+### Version 2.0 – Fully QA-Checked (November 2025)
 
-https://doi.org/10.5281/zenodo.17330832
+The **SUHS-MRV** dataset is an open, synthetic, and standards-aligned dataset designed for research, digital MRV workflows, and data-science applications in **Underground Hydrogen Storage (UHS)**.  
+This dataset aligns explicitly with:
 
-# Synthetic UHS–MRV Dataset for OFP–OSDU Integration in Hydrogen Storage Reporting (SUHS-OFPOSDU)
+- **Open Footprint (OFP) Well-Known Schemas**  
+- **Open Subsurface Data Universe (OSDU) WKS/WKE standards**  
+- MRV principles for hydrogen storage projects  
+- FAIR data practices  
+- Reproducible scientific computing
 
-## Authors
-- **Sreekanth Muktevi**  
-- **Yogesh Nagpal** 
-- **Rajesh Leela Thotakura**  
-- **Jyotsna Muktevi** 
+This version (v2.0) includes **fully rewritten and validated synthetic data**, reflecting corrected physics models, stable randomness, and reviewer-aligned data ranges.
 
 ---
 
-## Abstract / Overview
-This dataset represents, to the best of our knowledge, the **first publicly available synthetic Underground Hydrogen Storage (UHS) dataset** explicitly mapped to both the **Open Footprint (OFP) model** and the **Open Subsurface Data Universe (OSDU) schemas**.  
-It was developed to fill a critical gap by enabling **interoperability testing, MRV (Measurement, Reporting, and Verification) prototyping, and ESG reporting validation** for hydrogen storage systems in the energy sector.  
-
-The dataset includes **annual, daily, and monthly injection/withdrawal records** across 10 synthetic facilities with realistic reservoir-specific behavior, energy use, and mass balance validation.  
-All values are **synthetically generated** but follow realistic industry ranges and relationships, supporting reproducible research while avoiding confidentiality issues.  
-
----
-
-## Background & Motivation
-- **Hydrogen today**: widely used in refining, ammonia/fertilizer, methanol, and chemicals, with pilots in steel, mobility, and power.  
-- **Why UHS**: enables seasonal storage of hydrogen, balancing renewable energy and ensuring industrial continuity.  
-- **Maturity**:  
-  - Salt caverns → operational today (commercial use in US & EU).  
-  - Depleted gas fields / saline aquifers → pilot / feasibility studies only.  
-- **Why synthetic data**:  
-  - Real-world UHS data is **confidential or unavailable**.  
-  - Standards (OFP, OSDU, OGMP) are evolving faster than commercial deployment.  
-  - Synthetic datasets provide a **safe, standards-aligned testbed** for system development, research, and training.  
+## 🔥 What’s New in v2.0 (2025)
+- Rebuilt generator with strict physics validation  
+- Stable configuration using `uhs_config.yaml`  
+- Corrected injection/withdrawal logic  
+- Clean working-gas inventory dynamics  
+- Updated purity and loss modeling  
+- All indentation and Python import issues resolved  
+- Fully deterministic run using Numpy `Generator(seed)`  
+- Generated 100% clean CSV files:
+  - `facility_metadata.csv`
+  - `facility_timeseries.csv`
+  - `cycle_summary.csv`
 
 ---
 
-## Dataset Contents
-- `data/uhs_full_dataset_v1.0.csv` – Facility-level annual summary (10 facilities, QA-checked).  
-- `data/uhs_daily_v1.0.csv` – Daily injection/withdrawal with seasonality.  
-- `data/uhs_monthly_v1.0.csv` – Monthly roll-up from daily.  
-- `schema/schema.yaml` – Dataset schema definition.  
-- `schema/schema_crosswalk.csv` – Field-to-OFP/OSDU/MRV mapping.  
-- `docs/NOTES.md` – Methodology and QA validation rules.  
-- `LICENSE.txt` – License (CC BY 4.0).  
-- `CITATION.cff` – Citation metadata.  
+## 📁 Repository Structure
+SUHS-MRV/
+│
+├── src/
+│   ├── generator.py
+│   ├── physics.py
+│   ├── utils.py
+│   └── validation.py
+│
+├── config/
+│   └── uhs_config.yaml
+│
+├── data/
+│   └── generated/
+│       ├── facility_metadata.csv
+│       ├── facility_timeseries.csv
+│       └── cycle_summary.csv
+│
+├── docs/
+│
+├── notebooks/
+│
+├── requirements.txt
+├── CITATION.cff
+├── LICENSE.txt
+└── README.md
 
 ---
 
-“Annual file start/end dates represent the reporting year (2024). Daily and monthly tables provide the actual time series of injection/withdrawal activities within this period.”
+## 🧪 Dataset Outputs (Three CSVs)
 
----
-## OSDU Schema Alignment (2025 Standard)
-Compliant with the **OSDU Data Definitions repository** (*The Open Group, 2025*).  
-Earlier *WKE* prefixes replaced with current *WKS* identifiers.
+### 1. **facility_metadata.csv**
+One row per UHS facility. Includes:
+- Facility ID  
+- Type (salt cavern / depleted reservoir)  
+- Depth  
+- Temperature  
+- Pressure min/max  
+- Working gas capacity  
+- Cushion gas  
+- Porosity / permeability (for porous reservoirs)  
+- Volume model used  
 
-| Schema Group | Entity | Identifier |
-|---------------|---------|------------|
-| Master Data | Facility | `WKS:master-data--Facility:1.0.0` |
-| Master Data | Asset | `WKS:master-data--Asset:1.0.0` |
-| Master Data | Wellbore | `WKS:master-data--Wellbore:1.0.0` |
-| Work Product Component | Measurement | `WKS:work-product-component--Measurement:1.0.0` |
-| Work Product Component | ProductionData | `WKS:work-product-component--ProductionData:1.0.0` |
-| Work Product Component | EventMethod | `WKS:work-product-component--EventMethod:1.0.0` |
-| Extension (Proposed) | EnvironmentalData | `WKS:extension--EnvironmentalData:1.0.0` |
+### 2. **facility_timeseries.csv**
+Weekly time-series data:
+- Pressure (MPa)  
+- Temperature (°C)  
+- Working gas mass (kg)  
+- Hydrogen injected / withdrawn (kg)  
+- Dynamic losses  
+- Static losses  
+- Purity in / purity out  
+- Mass-balance residual indicator  
 
----
-
-## QA & Validation Rules
-- **Mass balance:** `net = injected − withdrawn − losses ≥ 0`.  
-- **Additivity:** daily & monthly totals = annual.  
-- **Reservoir-specific logic:**  
-  - Salt cavern → low losses (0.05–0.5%), high cycling, cushion gas constant.  
-  - Depleted gas → moderate losses (0.1–1%), methane co-production possible.  
-  - Saline aquifer → higher uncertainty, losses (0.2–1.5%).  
-- **Energy intensity:** compression energy / tonne-cycle ∈ 0.1–0.5 MWh/t-cycle.  
-- **Leak logic:** 0 events ⇒ 0 leak mass; >0 events ⇒ leak mass >0.  
-- **Transport coherence:** pipeline mode requires pipeline length >0, non-pipeline ⇒ length=0.  
-- **Geo/date checks:** coordinates in US bounds; dates within 2024.  
-
----
-
-## Intended Uses
-- UHS MRV reporting system prototyping.  
-- Data model integration testing between OFP and OSDU.  
-- Benchmarking analytics pipelines for hydrogen storage.  
-- Academic research, teaching, and training.  
+### 3. **cycle_summary.csv**
+Per-cycle aggregated performance:
+- Total injection/withdrawal  
+- Losses  
+- Average pressure  
+- Average temperature  
+- Efficiency  
+- Start/end timestamps  
 
 ---
 
-## Coordinates Disclaimer
-All latitude/longitude values are **synthetic**, generated randomly within U.S. bounds. They do **not** represent real UHS sites.  
+## 🧠 Scientific Basis & Modeling
+
+The dataset uses:
+- **Realistic thermodynamics** (ideal gas with custom tweak parameters)  
+- **Temperature gradient modeling**  
+- **Dynamic & static losses**  
+- **Purity-in / purity-out modeling**  
+- **Mass-balance validation**  
+- **Cycle-based operational patterns**  
 
 ---
 
-## Licensing & Citation
-- Licensed under **Creative Commons CC BY 4.0**.  
-- Users are free to share and adapt with appropriate credit.  
+## 🔧 How to Run Locally (Python)
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python3 -m src.generator
 
-**Citation:**  
-Muktevi, S., Nagpal, Y., Thotakura, R. L., & Muktevi, J. (2025). *Synthetic UHS–MRV Dataset for OFP–OSDU Integration in Hydrogen Storage Reporting (SUHS-OFPOSDU)* [Data set].(https://doi.org/10.5281/zenodo.17330832) 
+Output CSVs appear under: data/generated/
+
+---
+
+## 🎯 Standards Alignment
+
+### OSDU WKS/WKE Mapping  
+Fields are mapped to:
+- `WKS:master-data–Facility`
+- `WKS:master-data–Asset`
+- `WKE:Well`
+- `WKE:ProductionData`
+- `WKE:Measurement`
+
+### OFP Emissions Model Mapping  
+Includes:
+- Energy use  
+- Compression losses  
+- Leakage models  
+- MRV-ready fields
+
+All mappings are described in `docs/`.
 
 ---
 
-## Disclaimer
-This dataset is entirely **synthetic** and does not represent any real company, facility, or reservoir data.  
-Salt cavern examples reflect **commercial practice**, while depleted gas and saline aquifer examples are based on **pilot / feasibility scenarios**.  
-The dataset is provided solely for **educational, research, and development purposes**.  
+## 📚 Citation
+
+If you use SUHS-MRV, cite:
+Muktevi, S. (2025).
+Synthetic Underground Hydrogen Storage MRV Dataset (SUHS-MRV) v2.0.
+GitHub Repository: https://github.com/muktevisree/SUHS-MRV
+
+IEEE Data Descriptions submission is planned for Dec 2025.
 
 ---
+
+## 📄 License
+MIT License – free for research, education, commercial, and derivative use.
+
+---
+
+## 🧩 Future Releases
+
+- v2.1 – Add visual analytics notebook  
+- v3.0 – Multi-facility MRV integration  
+- v3.5 – Spatial GIS model (shapefiles + GeoJSON)  
+
+---
+
+## 🤝 Contributions Welcome
+Pull requests, issues, and improvements are invited.
