@@ -3,7 +3,7 @@ SUHS–MRV Dataset
 Modeling & Simulation Overview
 
 Version: v2.0
-Last Updated: 2025-11-30
+Last Updated: 2025-11-29
 Author: Sreekanth Muktevi
 
 This document describes the physics-based modeling framework used to generate the SUHS-MRV (Synthetic Underground Hydrogen Storage – Measurement, Reporting & Verification) dataset. It expands the modeling published in the IEEE Data Descriptions SCCS-MRV paper and adapts the same rigor for hydrogen.
