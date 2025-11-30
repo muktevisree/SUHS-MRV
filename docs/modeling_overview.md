@@ -1,6 +1,6 @@
-SUHS–MRV Dataset
+**SUHS–MRV Dataset**
 
-Modeling & Simulation Overview
+**Modeling & Simulation Overview**
 
 Version: v2.0
 Last Updated: 2025-11-29
@@ -20,7 +20,7 @@ The framework covers:
 
 ⸻
 
-1. Thermodynamic Model
+**1. Thermodynamic Model**
 
 1.1 Temperature
 
@@ -46,7 +46,7 @@ This captures monotonic mass–pressure behavior without requiring a full EOS.
 
 ⸻
 
-2. Working Gas Evolution
+**2. Working Gas Evolution**
 
 Working gas mass over time evolves as:
 
@@ -61,7 +61,7 @@ These constraints ensure realistic cycle behavior.
 
 ⸻
 
-3. Temperature Noise Model
+**3. Temperature Noise Model**
 
 Temperature noise follows:
 
@@ -76,7 +76,7 @@ Noise parameters come from YAML configuration.
 
 ⸻
 
-4. Loss Models
+**4. Loss Models**
 
 4.1 Static Losses
 
@@ -99,8 +99,7 @@ Loss fraction comes from YAML and simulates:
 	•	Thermal cycling effects
 
 ⸻
-
-5. Purity Tracking Model
+**5. Purity Tracking Model**
 
 UHS purity evolves due to mixing, operational cycles, and inflow/outflow purity differences.
 
@@ -127,7 +126,7 @@ This produces impurity buildup over long-term storage cycles.
 
 ⸻
 
-6. MRV Mass-Balance Validation
+**6. MRV Mass-Balance Validation**
 
 The mass-balance residual is:
 
@@ -141,7 +140,7 @@ Residuals appear in timeseries under MRV fields.
 
 ⸻
 
-7. Injection/Withdrawal Cycle Simulation
+**7. Injection/Withdrawal Cycle Simulation**
 
 7.1 Cycle modes
 
@@ -170,7 +169,7 @@ Mapped internally as:
 
 ⸻
 
-8. Alignment with OFP & OSDU
+**8. Alignment with OFP & OSDU**
 
 8.1 OFP (Open Footprint)
 
