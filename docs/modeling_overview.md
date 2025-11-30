@@ -1,238 +1,200 @@
-# SUHS–MRV Dataset  
-## Modeling & Simulation Overview  
-Version: v2.0  
-Last Updated: 2025-11-30  
+SUHS–MRV Dataset
+
+Modeling & Simulation Overview
+
+Version: v2.0
+Last Updated: 2025-11-30
 Author: Sreekanth Muktevi
 
-This document describes the physics-based modeling framework used to generate the SUHS-MRV (Synthetic Underground Hydrogen Storage – Measurement, Reporting & Verification) dataset. It includes:
-
-1. Thermodynamic model  
-2. Pressure–volume–temperature (PVT) relationships  
-3. Temperature noise model  
-4. Static & dynamic loss models  
-5. Purity tracking model  
-6. MRV mass-balance validation  
-7. Injection/withdrawal cycle simulation  
-8. Notes on alignment with OFP & OSDU schemas  
-
-The modeling logic is identical to the version accepted by _IEEE Data Descriptions_ for SCCS-MRV and adapted for UHS.
-
----
-
-# 1. Thermodynamic Model
-
-A simplified but physically realistic H₂ storage thermodynamic model is used.
-
-### **Temperature computation**
-Temperature evolves as:
-
-\[
-T_c = T_\text{base} + (z \cdot \text{gradient}_{C/km}) + \epsilon_t
-\]
-
-Where:
-
-- **T_base**: temperature at surface  
-- **z**: depth in km  
-- **gradient**: geothermal gradient  
-- **εₜ**: random temperature perturbation from the noise model  
-
-This ensures temperature varies smoothly across the depth of each facility.
-
-### **Pressure from mass**
-Pressure is computed using a linearized PVT model:
-
-\[
-P_{\text{MPa}} = P_{\min} + (P_{\max} - P_{\min}) \cdot \frac{m_{\text{working}}}{m_{\text{capacity}}}
-\]
-
-This preserves the monotonic relationship of mass ↔ pressure without requiring a full EOS.
-
----
-
-# 2. PVT Behavior & Working Gas Evolution
-
-The **working gas mass** inside the facility is updated each time-step using:
-
-\[
-m_{t+1} = m_t + m_{\text{inj}} - m_{\text{wd}} - L_{\text{static}} - L_{\text{dynamic}}
-\]
-
-Key aspects:
-
-- Mass never drops below 0.  
-- Mass never exceeds **working_gas_capacity_kg**.  
-- Injection/withdrawal rates are capped at **≤25%** of capacity per cycle.
-
-This ensures realistic operational constraints.
-
----
-
-# 3. Temperature Noise Model
-
-Temperature is perturbed with Gaussian noise:
-
-\[
-\epsilon_t \sim \mathcal{N}(0, \sigma_T)
-\]
-
-Where **σ_T** comes from YAML config.  
-Noise affects:
-
-- Computed pressure  
-- Density relationships  
-- Purity degradation rates (small effect)
-
----
-
-# 4. Loss Models
-
-Underground hydrogen storage experiences two major categories of losses:
-
-## **4.1 Static Losses**
-Represent persistent micro-leakage or cushion gas interactions.
-
-Model:
-
-\[
-L_{\text{static}} = k_s \cdot m_{\text{working}}
-\]
-
-- **k_s** sampled from YAML distribution  
-- Represents 0.01–0.05% of mass per time-step typically  
-- More important for long-term storage
-
-## **4.2 Dynamic Losses**
-Generated during pressure/temperature cycling.
-
-Model:
-
-\[
-L_{\text{dynamic}} = f(m_{\text{working}}, \Delta P, \Delta T)
-\]
-
-Implemented via:
-
-```python
-dynamic_losses_kg = compute_cycle_losses_kg(working_gas_kg, loss_fraction)
-
-Loss fraction sampled from YAML to emulate:
-	•	Valves
-	•	Line-pack disturbances
-	•	Mixing inefficiencies
-	•	Temperature swings
-
-**5. Purity Tracking Model**
-
-Purity in/out is computed using a dual-process model:
-
-Inlet purity
-
-Randomly sampled: inlet_purity = sample_inlet_purity_pct(cfg, rng)
-
-Outlet purity
-
-Outlet purity depends on:
-	•	Current working gas purity
-	•	Inlet purity
-	•	Injection/withdrawal ratio
-	•	Temperature & pressure
-
-Model:
-
-[
-\text{purity}{\text{out}} = f(\text{purity}{\text{working}}, m_{\text{inj}}, m_{\text{wd}})
-]
-
-Implemented as:
-outlet_purity = update_purity_out_pct(
-    working_purity_pct,
-    inlet_purity_pct,
-    injected_mass_kg,
-    withdrawn_mass_kg,
-    cfg
-)
-
-Working gas purity update
-
-After each cycle:
-
-[
-\text{working_purity}_{t+1} =
-\text{weighted mean of (previous purity, inlet purity)}
-]
-
-This ensures impurity buildup over cycles, matching actual UHS behavior.
-
-**6. MRV: Mass-Balance Validation**
-
-The MRV residual quantifies model accuracy:
-
-[
-\text{residual} =
-\frac{m_{t+1} - (m_t + m_{\text{inj}} - m_{\text{wd}} - L_s - L_d)}{m_{\text{capacity}}}
-]
-
-Values are normally in:
-	•	10⁻⁶ – 10⁻⁴ range for stable operations
-	•	Any value > 1e-3 indicates anomaly conditions (kept for realism)
-
----
-
-
-**# 7. Injection/Withdrawal Cycle Simulation**
-
-Each facility is simulated across multiple cycles.
-
-### **7.1 Cycle direction modes**
-
-- injection_heavy  
-- withdrawal_heavy  
-- balanced  
-
-### **7.2 Cycle fraction dynamics**
-
-The engine enforces:
-
-- Random walk variations  
-- Hard caps: **0.1 ≤ cycle_fraction ≤ 0.9**  
-- Maximum per-cycle injection/withdrawal ≤ **25% capacity**
-
-### **7.3 Time resolution**
-
-Configured in YAML:
-
-frequency: weekly → W
-frequency: daily  → D
-frequency: monthly → MS
-
-Converted via:
-
-```python
-FREQ_MAP = {"weekly": "W", "daily": "D", "monthly": "MS"}
-
-**8. Alignment with OFP & OSDU**
-
-Every field is aligned to:
-
-✔ OFP (Open Footprint)
-	•	Working gas mass
-	•	Losses
-	•	Purity
-	•	MRV residuals
-
-✔ OSDU WKS/WKE
-	•	Facility metadata
-	•	Reservoir parameters
-	•	Temperature & pressure
-	•	Production + injection records
-
-This ensures interoperability with:
-	•	OSDU Core Services
-	•	OFP MRV Engines
-	•	Digital twins
-	•	ESG reporting pipelines
+This document describes the physics-based modeling framework used to generate the SUHS-MRV (Synthetic Underground Hydrogen Storage – Measurement, Reporting & Verification) dataset. It expands the modeling published in the IEEE Data Descriptions SCCS-MRV paper and adapts the same rigor for hydrogen.
+
+The framework covers:
+	1.	Thermodynamic model
+	2.	Pressure–volume–temperature behavior
+	3.	Temperature noise model
+	4.	Static and dynamic losses
+	5.	Purity evolution model
+	6.	MRV mass-balance validation
+	7.	Injection/withdrawal cycle simulation
+	8.	Alignment with OFP & OSDU schemas
 
 ⸻
 
-✔ End of Document
+1. Thermodynamic Model
+
+1.1 Temperature
+
+Temperature at depth is computed using:
+
+Tc = T_base + (depth_km × gradient_C_per_km) + noise
+
+Where:
+	•	T_base = surface reference temperature
+	•	depth_km = reservoir or cavern depth
+	•	gradient = geothermal gradient
+	•	noise = Gaussian perturbation from YAML config
+
+This ensures realistic vertical and temporal variation.
+
+1.2 Pressure
+
+A linearized PVT model is used:
+
+Pressure_MPa = P_min + (P_max − P_min) × (working_gas_mass / working_capacity)
+
+This captures monotonic mass–pressure behavior without requiring a full EOS.
+
+⸻
+
+2. Working Gas Evolution
+
+Working gas mass over time evolves as:
+
+m_next = m_current + injection − withdrawal − static_losses − dynamic_losses
+
+Model constraints:
+	•	Mass never becomes negative
+	•	Mass never exceeds working capacity
+	•	Per-cycle injection/withdrawal ≤ 25% of capacity
+
+These constraints ensure realistic cycle behavior.
+
+⸻
+
+3. Temperature Noise Model
+
+Temperature noise follows:
+
+Gaussian(mean=0, sigma=T_noise_sigma)
+
+Effects:
+	•	Slight pressure variability
+	•	Small influence on purity changes
+	•	Improves realism in cycle-to-cycle variation
+
+Noise parameters come from YAML configuration.
+
+⸻
+
+4. Loss Models
+
+4.1 Static Losses
+
+Represent steady leakage or interaction with reservoir/cushion gas:
+
+static_loss = k_static × working_mass
+
+Where k_static is sampled from YAML (typically 0.01–0.05% of mass per time-step).
+
+4.2 Dynamic Losses
+
+Dynamic losses represent pressure and temperature cycling effects:
+
+dynamic_loss = compute_cycle_losses_kg(working_mass, loss_fraction)
+
+Loss fraction comes from YAML and simulates:
+	•	Valve/line-pack disturbances
+	•	Rapid pressure changes
+	•	Mixing inefficiencies
+	•	Thermal cycling effects
+
+⸻
+
+5. Purity Tracking Model
+
+UHS purity evolves due to mixing, operational cycles, and inflow/outflow purity differences.
+
+5.1 Inlet purity
+
+Sampled using:
+sample_inlet_purity_pct(cfg, rng)
+
+5.2 Outlet purity
+
+Outlet purity depends on:
+	•	Working gas purity
+	•	Inlet purity
+	•	Injected and withdrawn mass
+	•	Temperature and pressure
+
+Logic is implemented via:
+update_purity_out_pct(working, inlet, injected, withdrawn, cfg)
+
+5.3 Working gas purity update
+
+Working purity is updated as a weighted mixture of prior purity and inlet purity.
+This produces impurity buildup over long-term storage cycles.
+
+⸻
+
+6. MRV Mass-Balance Validation
+
+The mass-balance residual is:
+
+residual = (actual_mass_change − expected_mass_change) / working_capacity
+
+Typical values:
+	•	1e-6 to 1e-4 → stable normal operations
+	•	1e-3 → anomalies introduced for realism
+
+Residuals appear in timeseries under MRV fields.
+
+⸻
+
+7. Injection/Withdrawal Cycle Simulation
+
+7.1 Cycle modes
+
+Three cycle modes are used:
+	•	injection_heavy
+	•	withdrawal_heavy
+	•	balanced
+
+7.2 Cycle fraction dynamics
+
+Rules enforced:
+	•	Random-walk evolution
+	•	Cycle fraction constrained between 0.1 and 0.9
+	•	Per-cycle injection/withdrawal ≤ 25% capacity
+
+7.3 Time resolution
+
+Configured via YAML:
+
+weekly  → W
+daily   → D
+monthly → MS
+
+Mapped internally as:
+{“weekly”:“W”, “daily”:“D”, “monthly”:“MS”}
+
+⸻
+
+8. Alignment with OFP & OSDU
+
+8.1 OFP (Open Footprint)
+
+Dataset fields aligned with OFP include:
+	•	Working gas mass
+	•	Losses
+	•	Purity
+	•	MRV residual
+
+8.2 OSDU
+
+The dataset aligns with OSDU Well-Known Schemas (WKS / WKE):
+	•	master-data–Facility
+	•	master-data–Asset
+	•	Wellbore / Well
+	•	ProductionData
+	•	Measurement
+
+This enables seamless ingestion into:
+	•	OSDU data platforms
+	•	Digital twins
+	•	ESG reporting systems
+	•	OFP MRV engines
+
+⸻
+
+End of Document
