@@ -1,6 +1,6 @@
-Usage Examples
+**Usage Examples**
 
-SUHS–MRV Dataset (v2.0)
+**SUHS–MRV Dataset (v2.0)**
 
 This document provides practical examples for reading, analyzing, validating, and visualizing the SUHS-MRV synthetic Underground Hydrogen Storage dataset.
 
@@ -8,7 +8,7 @@ The examples use Python, Pandas, and Matplotlib, but the dataset is tool-agnosti
 
 ⸻
 
-1. Loading the Dataset
+**1. Loading the Dataset**
 
 1.1 Load all CSV files
 
@@ -24,7 +24,7 @@ print(cycles.head())
 
 ⸻
 
-2. Filtering Time Series by Facility
+**2. Filtering Time Series by Facility**
 
 2.1 Select a single facility
 
@@ -35,7 +35,7 @@ print(ts_f1.head())
 
 ⸻
 
-3. Plot Pressure vs Time
+**3. Plot Pressure vs Time**
 
 import matplotlib.pyplot as plt
 
@@ -52,7 +52,7 @@ plt.show()
 
 ⸻
 
-4. Plot Injection & Withdrawal
+**4. Plot Injection & Withdrawal**
 
 plt.figure(figsize=(12,5))
 plt.plot(f[“timestamp”], f[“h2_injected_kg”], label=“Injected”)
@@ -67,7 +67,7 @@ plt.show()
 
 ⸻
 
-5. MRV Mass-Balance Residual Analysis
+**5. MRV Mass-Balance Residual Analysis**
 
 5.1 Identify high residuals
 
@@ -80,7 +80,7 @@ f[“mrv_residual”].hist(bins=50)
 
 ⸻
 
-6. Purity Analysis
+**6. Purity Analysis**
 
 6.1 Plot purity over time
 
@@ -100,7 +100,7 @@ print(impurity_df)
 
 ⸻
 
-7. Cycle Summary Examples
+**7. Cycle Summary Examples**
 
 7.1 Injection/Withdrawal Efficiency
 
@@ -113,7 +113,7 @@ print(cycles[[“facility_id”, “cycle_index”, “efficiency_ratio”]].hea
 
 ⸻
 
-8. Facility-Level Analytics
+**8. Facility-Level Analytics**
 
 8.1 Compute average depth, porosity, temperature
 
@@ -125,7 +125,7 @@ facility.groupby(“facility_type”)[“working_capacity_kg”].mean()
 
 ⸻
 
-9. Merging Data for End-to-End Analysis
+**9. Merging Data for End-to-End Analysis**
 
 merged = ts.merge(facility, on=“facility_id”, how=“left”)
 merged = merged.merge(cycles, on=[“facility_id”, “cycle_index”], how=“left”)
@@ -134,7 +134,7 @@ print(merged.head())
 
 ⸻
 
-10. Querying for Anomalies
+**10. Querying for Anomalies**
 
 10.1 High pressure anomaly
 
@@ -151,7 +151,7 @@ print(bad_cycles)
 
 ⸻
 
-11. Exporting Cleaned or Filtered Subsets
+**11. Exporting Cleaned or Filtered Subsets**
 
 11.1 Export a single facility
 
@@ -163,7 +163,7 @@ anomalies.to_csv(“anomalies.csv”, index=False)
 
 ⸻
 
-12. Using with OSDU or OFP Pipelines
+**12. Using with OSDU or OFP Pipelines**
 
 12.1 OSDU
 
@@ -189,7 +189,7 @@ These fields are already included in timeseries.
 
 ⸻
 
-13. Using with ML / Forecasting
+**13. Using with ML / Forecasting**
 
 13.1 Build a simple LSTM model
 
@@ -203,7 +203,7 @@ model.compile(optimizer=“adam”, loss=“mse”)
 
 ⸻
 
-14. Notebook Integration
+**14. Notebook Integration**
 
 Recommended structure:
 
