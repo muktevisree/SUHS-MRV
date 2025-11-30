@@ -93,4 +93,3 @@ Summarizes every injection/withdrawal cycle for each facility.
 
 ---
 
-# End of Document
