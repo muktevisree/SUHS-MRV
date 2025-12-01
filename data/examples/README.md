@@ -23,7 +23,8 @@ First few cycles for the same facility.
 Small subset of multiple facility configurations.
 
 ### **ofp_uhs_example_metadata.json**
-A minimal OFP-style metadata document for facility UHS_001.
+A minimal OFP-style metadata document for facility UHS_001
+
 ---
 
 ## How Example Files Should Be Created
