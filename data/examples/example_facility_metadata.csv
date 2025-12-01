@@ -1,0 +1,4 @@
+facility_id,facility_name,country_code,latitude,longitude,storage_type,working_gas_capacity_kg,reservoir_depth_m,reservoir_pressure_mpa,reservoir_temperature_c,geothermal_gradient_c_per_km
+UHS_001,Delta Storage 1,US,31.25,-97.45,Depleted Gas Field,850000,1450,10.5,48.2,28
+UHS_002,Delta Storage 2,US,31.40,-97.60,Salt Cavern,600000,900,8.2,42.0,30
+UHS_003,Delta Storage 3,CA,52.15,-112.45,Aquifer,400000,1200,9.7,46.3,27
