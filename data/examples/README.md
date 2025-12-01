@@ -22,6 +22,8 @@ First few cycles for the same facility.
 ### **example_facility_metadata.csv**
 Small subset of multiple facility configurations.
 
+### **ofp_uhs_example_metadata.json**
+A minimal OFP-style metadata document for facility UHS_001.
 ---
 
 ## How Example Files Should Be Created
