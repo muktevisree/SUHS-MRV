@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "facilityId": "UHS_001",
+  "facilityName": "Example Underground Hydrogen Storage Site",
+  "assetType": "UndergroundHydrogenStorage",
+  "operator": {
+    "name": "Example Operator Ltd.",
+    "country": "US"
+  },
+  "location": {
+    "countryCode": "US",
+    "region": "TX",
+    "latitude": 29.7604,
+    "longitude": -95.3698
+  },
+  "uhsCharacteristics": {
+    "storageMedium": "PorousReservoir",
+    "workingGasCapacity_kg": 1200000.0,
+    "cushionGas_kg": 600000.0,
+    "depth_m": 1800.0,
+    "reservoirTemperature_C": 70.0,
+    "reservoirPressureMin_MPa": 12.0,
+    "reservoirPressureMax_MPa": 24.0
+  },
+  "reporting": {
+    "schema": "OFP-UHS-MRV-v1",
+    "timeZone": "UTC",
+    "mrvBoundary": "ReservoirAndSurfaceFacilities",
+    "dataSource": "Synthetic_SUHS-MRV_v2.0"
+  }
+}
