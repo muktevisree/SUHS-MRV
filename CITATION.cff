@@ -1,13 +1,18 @@
 cff-version: 1.2.0
 title: "Synthetic UHS–MRV Dataset for OFP–OSDU Integration in Hydrogen Storage Reporting (SUHS-OFPOSDU)"
-license: CC-BY-4.0
-version: 1.0
+version: "1.0.0"
+license: "CC-BY-4.0"
+
 authors:
-  - family-names: Muktevi
-    given-names: Sreekanth
-  - family-names: Nagpal
-    given-names: Yogesh
-  - family-names: Thotakura
-    given-names: Rajesh Leela
-  - family-names: Muktevi
-    given-names: Jyotsna
+  - family-names: "Muktevi"
+    given-names: "Sreekanth"
+  - family-names: "Nagpal"
+    given-names: "Yogesh"
+  - family-names: "Thotakura"
+    given-names: "Rajesh Leela"
+  - family-names: "Muktevi"
+    given-names: "Jyotsna"
+
+message: "If you use this dataset or code, please cite using the metadata in this file."
+date-released: "2025-11-30"
+url: "https://github.com/muktevisree/SUHS-MRV"
