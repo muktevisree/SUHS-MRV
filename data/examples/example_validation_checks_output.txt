@@ -1,0 +1,99 @@
+SUHS-MRV v2.0 – Example Validation Output
+=========================================
+Run date: 2025-11-30
+Python: 3.10+
+Data directory: data/generated/
+
+Input files
+-----------
+[OK] facility_metadata.csv found (shape: 15 rows × 12 columns)
+[OK] facility_timeseries.csv found (shape: 10950 rows × 14 columns)
+[OK] cycle_summary.csv found (shape: 360 rows × 11 columns)
+
+File-level checks
+-----------------
+[OK] facility_metadata.csv is non-empty
+[OK] facility_timeseries.csv is non-empty
+[OK] cycle_summary.csv is non-empty
+
+Schema & type checks
+--------------------
+[OK] facility_metadata.csv has expected columns:
+     facility_id, facility_name, facility_type, country_code,
+     latitude, longitude, depth_m, cavern_volume_m3,
+     working_gas_capacity_kg, reservoir_type, start_date, end_date
+
+[OK] facility_timeseries.csv has expected columns:
+     timestamp, facility_id, h2_injected_kg, h2_withdrawn_kg,
+     working_gas_kg, static_losses_kg, dynamic_losses_kg,
+     h2_inlet_purity_pct, h2_outlet_purity_pct, h2_working_purity_pct,
+     pressure_mpa, temperature_c, mass_balance_residual, mode
+
+[OK] cycle_summary.csv has expected columns:
+     facility_id, cycle_index, cycle_start, cycle_end,
+     total_injected_kg, total_withdrawn_kg, total_losses_kg,
+     avg_pressure_mpa, avg_temperature_c, cycle_efficiency, mode
+
+Facility ID consistency
+-----------------------
+Unique facilities in metadata   : 15
+Unique facilities in timeseries : 15
+Unique facilities in cycles     : 15
+
+[OK] All facility_id values in facility_metadata.csv are present in facility_timeseries.csv
+[OK] All facility_id values in facility_metadata.csv are present in cycle_summary.csv
+
+MRV mass-balance residuals
+--------------------------
+mass_balance_residual (timeseries):
+
+count    1.0950e+04
+mean     2.3e-07
+std      7.5e-06
+min     -3.6e-05
+25%     -2.1e-06
+50%      1.2e-07
+75%      2.4e-06
+max      4.1e-05
+
+Max |mass_balance_residual|  : 4.1e-05
+Rows with |residual| > 1e-03 : 0
+Rows with |residual| > 5e-03 : 0
+
+[OK] Residuals within expected bounds for synthetic MRV dataset
+
+Purity & physical ranges
+------------------------
+h2_inlet_purity_pct:
+    min=98.50, max=99.99, <90%: 0, >100%: 0
+h2_outlet_purity_pct:
+    min=97.80, max=99.95, <90%: 0, >100%: 0
+h2_working_purity_pct:
+    min=97.40, max=99.90, <90%: 0, >100%: 0
+
+[OK] All purity values lie in a physically reasonable band (97–100%)
+
+Pressure & temperature sanity checks
+------------------------------------
+pressure_mpa:
+    min=4.5, max=23.8
+temperature_c:
+    min=18.2, max=62.7
+
+[OK] No negative or zero pressures
+[OK] Temperatures within expected geothermal envelope for UHS caverns
+
+Cycle-level aggregates
+----------------------
+Number of cycles in cycle_summary.csv : 360
+
+cycle_efficiency:
+    min=0.91, max=0.99, mean=0.96
+
+[OK] Cycle efficiencies mostly between 0.9 and 1.0
+
+Overall status
+--------------
+All core validation checks completed successfully.
+
+RESULT: PASS (SUHS-MRV v2.0 dataset is internally consistent and ready for use)
